@@ -5,11 +5,17 @@ import { EditOutlined, DeleteOutlined, PlusOutlined } from '@ant-design/icons';
 import { v4 as uuidv4 } from 'uuid';
 import { useTableStore } from './store/useTableStore';
 import type { TableRecord } from './store/useTableStore';
+import dayjs from 'dayjs';
 
 const App: React.FC = () => {
-  const { records, deleteRecord, addRecord } = useTableStore();
+  const records = useTableStore((state) => state.records);
+  const deleteRecord = useTableStore((state) => state.deleteRecord);
+  const addRecord = useTableStore((state) => state.addRecord);
+  const updateRecord = useTableStore((state) => state.updateRecord);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const [editRecordId, setEditRecordId] = useState<string | null>(null);
 
   const [form] = Form.useForm();
 
@@ -37,7 +43,7 @@ const App: React.FC = () => {
           <Button
             type="text"
             icon={<EditOutlined />}
-            onClick={() => console.log(record.id)}
+            onClick={() => handleEditClick(record)}
           />
           <Button
             type="text"
@@ -51,15 +57,41 @@ const App: React.FC = () => {
   ], [deleteRecord]);
 
   const handleFinish = (values: any) => {
-    const newRecord: TableRecord = {
-      id: uuidv4(),
-      name: values.name,
-      date: values.date.format('YYYY-MM-DD'),
-      value: values.value,
-    };
+    const formattedDate = values.date.format('YYYY-MM-DD');
 
-    addRecord(newRecord);
+    if (editRecordId) {
+      updateRecord({
+        id: editRecordId,
+        name: values.name,
+        date: formattedDate,
+        value: values.value,
+      });
+    } else {
+      const newRecord: TableRecord = {
+        id: uuidv4(),
+        name: values.name,
+        date: formattedDate,
+        value: values.value,
+      };
+      addRecord(newRecord);
+    }
+
+    closeModal();
+  };
+
+  const handleEditClick = (record: TableRecord) => {
+    setEditRecordId(record.id);
+    form.setFieldsValue({
+      name: record.name,
+      date: dayjs(record.date),
+      value: record.value,
+    });
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
     setIsModalOpen(false);
+    setEditRecordId(null);
     form.resetFields();
   };
 
@@ -80,12 +112,9 @@ const App: React.FC = () => {
       />
 
       <Modal
-        title="Добавить запись"
+        title={editRecordId ? "Редактировать запись" : "Добавить запись"}
         open={isModalOpen}
-        onCancel={() => {
-          setIsModalOpen(false);
-          form.resetFields();
-        }}
+        onCancel={closeModal}
         onOk={() => form.submit()}
         okText="Сохранить"
         cancelText="Отмена"
