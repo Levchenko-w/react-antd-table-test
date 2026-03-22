@@ -117,9 +117,9 @@ const App: React.FC = () => {
 
   return (
     <div className="app-container" style={{ maxWidth: 1200, margin: '0 auto', padding: '20px' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 20 }}>
+      <div className={"header-actions"}>
         <h2>Таблица с данными</h2>
-        <div style={{ display: 'flex', gap: '16px' }}>
+        <div className={"controls"}>
           <Input
             placeholder="Поиск"
             value={searchQuery}
