@@ -27,16 +27,19 @@ const App: React.FC = () => {
       title: 'Имя',
       dataIndex: 'name',
       key: 'name',
+      sorter: (a, b) => a.name.localeCompare(b.name),
     },
     {
       title: 'Дата',
       dataIndex: 'date',
       key: 'date',
+      sorter: (a, b) => a.date.localeCompare(b.date),
     },
     {
       title: 'Значение',
       dataIndex: 'value',
       key: 'value',
+      sorter: (a, b) => a.value - b.value,
     },
     {
       title: 'Действия',
