@@ -13,6 +13,9 @@ const App: React.FC = () => {
   const addRecord = useTableStore((state) => state.addRecord);
   const updateRecord = useTableStore((state) => state.updateRecord);
 
+  const searchQuery = useTableStore((state) => state.searchQuery);
+  const setSearchQuery = useTableStore((state) => state.setSearchQuery);
+
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const [editRecordId, setEditRecordId] = useState<string | null>(null);
@@ -55,6 +58,20 @@ const App: React.FC = () => {
       ),
     },
   ], [deleteRecord]);
+
+  const filteredRecords = useMemo(() => {
+    if (!searchQuery) return records;
+
+    const lowerCaseQuery = searchQuery.toLowerCase();
+
+    return records.filter((record) => {
+      const matchName = record.name.toLowerCase().includes(lowerCaseQuery);
+      const matchDate = record.date.includes(lowerCaseQuery);
+      const matchValue = record.value.toString().includes(lowerCaseQuery);
+
+      return matchName || matchDate || matchValue;
+    });
+  }, [records, searchQuery]);
 
   const handleFinish = (values: any) => {
     const formattedDate = values.date.format('YYYY-MM-DD');
@@ -99,15 +116,24 @@ const App: React.FC = () => {
     <div className="app-container" style={{ maxWidth: 1200, margin: '0 auto', padding: '20px' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 20 }}>
         <h2>Таблица с данными</h2>
-        <Button type="primary" icon={<PlusOutlined />} onClick={() => setIsModalOpen(true)}>
-          Добавить
-        </Button>
+        <div style={{ display: 'flex', gap: '16px' }}>
+          <Input
+            placeholder="Поиск"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            allowClear
+            style={{ width: 300 }}
+          />
+          <Button type="primary" icon={<PlusOutlined />} onClick={() => setIsModalOpen(true)}>
+            Добавить
+          </Button>
+        </div>
       </div>
 
       <Table
         columns={columns}
-        dataSource={records}
-        rowKey="id"
+        dataSource={filteredRecords}
+        rowKey={"id"}
         pagination={false}
       />
 
@@ -146,7 +172,7 @@ const App: React.FC = () => {
 
         </Form>
       </Modal>
-    </div>
+    </div >
   );
 };
 
