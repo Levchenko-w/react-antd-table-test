@@ -17,13 +17,8 @@ interface TableStore {
   setSearchQuery: (query: string) => void;
 }
 
-const MockData: TableRecord[] = [
-  { id: '1', name: 'Тест 1', date: '2026-03-19', value: 1 },
-  { id: '2', name: 'Тест 2', date: '2026-03-20', value: 2 },
-]
-
 export const useTableStore = create<TableStore>((set) => ({
-  records: MockData,
+  records: [],
   searchQuery: '',
 
 
