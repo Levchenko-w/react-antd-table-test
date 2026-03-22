@@ -137,7 +137,12 @@ const App: React.FC = () => {
         columns={columns}
         dataSource={filteredRecords}
         rowKey={"id"}
-        pagination={false}
+        pagination={{
+          defaultPageSize: 5,
+          showSizeChanger: true,
+          pageSizeOptions: ['5', '10', '20'],
+          showTotal: (total) => `Всего записей: ${total}`,
+        }}
       />
 
       <Modal
